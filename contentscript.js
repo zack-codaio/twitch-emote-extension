@@ -8,6 +8,7 @@ var recording = false;  //boolean toggle for if recording is happening
 var intervalID;         //the timer interval that controls when scraping is done
 var curMinute;          //track the current minute / interval
 var emotesData;         //array of the emotes
+var emotesSources = {}; //object with links to the image source
 
 $(document).ready(function () {
     console.log("CONTENT SCRIPT LOADED");
@@ -121,6 +122,7 @@ function scrapeMessages(){
             for(var j = 0; j < emotes.length; j++){
                 //console.log(emotes[j].alt);
                 var curEmote = emotes[j].alt; //get type of emote from the alt text of the image
+                var emoteSource = emotes[j].src;
 
                 //add to minuteData (and emotesData)
                 if(minuteData.hasOwnProperty(curEmote)){
@@ -130,6 +132,13 @@ function scrapeMessages(){
                 else{
                     //console.log("adding new property "+curEmote+" to minuteData");
                     minuteData[curEmote] = 1;
+                }
+
+
+                //add img source to emotesSources
+                if(!emotesSources.hasOwnProperty(curEmote)){
+                    emotesSources[curEmote] = emoteSource;
+                    //console.log(emotesSources);
                 }
             }
         }
