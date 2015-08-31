@@ -74,19 +74,52 @@ function toggleUI(){
 
 
 var recording = false;
+var intervalID;
 function toggleRecord(){
 
     if(recording){
-        console.log("recording == true");
+        console.log("Stopping recording");
         $("#recordImg").attr("src", chrome.extension.getURL("img/record.svg"));
         $("#record-text").html("Record");
+        clearInterval(intervalID);
         recording = false;
     }
     else{
-        console.log("recording == false");
+        console.log("Starting recording");
         $("#recordImg").attr("src", chrome.extension.getURL("img/pause.svg"));
         $("#record-text").html("Pause");
+
+        //trigger recording
+        $(".message-line").remove(); //clear out existing messages
+        intervalID = setInterval(function(){
+           scrapeMessages();
+        },20000); //currently, 10 seconds
+
         recording = true;
     }
 }
 
+function scrapeMessages(){
+    //get existing messages
+    var newMessages = $(".message-line");
+
+    //count occurrences of emotes in each message
+    for(var i = 0; i < newMessages.length; i++){
+        var messagetext = $(newMessages[i]).children(".message")[0];
+        var emotes = $(messagetext).children("img");
+        if(emotes.length > 0){
+            //console.log(emotes);
+            for(var j = 0; j < emotes.length; j++){
+                console.log(emotes[j].alt);
+
+                //add to json
+            }
+
+        }
+    }
+
+
+
+    //clear messages from DOM
+    newMessages.remove();
+}
