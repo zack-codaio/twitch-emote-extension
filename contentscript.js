@@ -19,14 +19,21 @@ $(document).ready(function () {
         toggleUI();
     });
 
-    emotePanel.append('<div id="recordButton" class="button-container"><img id="recordImg" class="button-img"><div class="button-text">Record</div></div>');
+    emotePanel.append('<div id="recordButton" class="button-container"><img id="recordImg" class="button-img"><div id="record-text" class="button-text">Record</div></div>');
     document.getElementById("recordImg").src = chrome.extension.getURL("img/record.svg");
 
     emotePanel.append('<div id="visualizeButton" class="button-container"><img id="visualizeImg" class="button-img"><div class="button-text">Visualize</div></div>');
     document.getElementById("visualizeImg").src = chrome.extension.getURL("img/graph.svg");
 
-    //$("#recordButton").hide();
-    //$("#visualizeButton").hide();
+    $("#recordButton").click(function(event){
+       toggleRecord();
+        event.stopPropagation();
+
+    });
+    $("#visualizeButton").click(function(event){
+        //visualize();
+        event.stopPropagation();
+    })
 
 });
 
@@ -65,4 +72,21 @@ function toggleUI(){
 
 }
 
+
+var recording = false;
+function toggleRecord(){
+
+    if(recording){
+        console.log("recording == true");
+        $("#recordImg").attr("src", chrome.extension.getURL("img/record.svg"));
+        $("#record-text").html("Record");
+        recording = false;
+    }
+    else{
+        console.log("recording == false");
+        $("#recordImg").attr("src", chrome.extension.getURL("img/pause.svg"));
+        $("#record-text").html("Pause");
+        recording = true;
+    }
+}
 

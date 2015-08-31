@@ -10,7 +10,7 @@
   margin-top: 9px; }
 
 .button-container {
-  display: inline-block;
+  display: none;
   text-align: center;
   width: 50px;
   margin-left: 15px;
