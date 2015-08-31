@@ -2,7 +2,12 @@
  * Created by zackaman on 8/30/15.
  */
 
-var emotePanel;
+var emotePanel;         //the actual panel itself
+var ui_open = false;    //is the panel open or closed?
+var recording = false;  //boolean toggle for if recording is happening
+var intervalID;         //the timer interval that controls when scraping is done
+var curMinute;          //track the current minute / interval
+var emotesData;         //array of the emotes
 
 $(document).ready(function () {
     console.log("CONTENT SCRIPT LOADED");
@@ -36,8 +41,6 @@ $(document).ready(function () {
     })
 
 });
-
-var ui_open = false;
 
 function toggleUI(){
     console.log("toggling UI");
@@ -73,8 +76,7 @@ function toggleUI(){
 }
 
 
-var recording = false;
-var intervalID;
+
 function toggleRecord(){
 
     if(recording){
@@ -91,8 +93,12 @@ function toggleRecord(){
 
         //trigger recording
         $(".message-line").remove(); //clear out existing messages
+        emotesData = [];
+        curMinute = 0;
         intervalID = setInterval(function(){
-           scrapeMessages();
+            scrapeMessages();
+            curMinute++;
+            console.log(emotesData);
         },20000); //currently, 10 seconds
 
         recording = true;
@@ -103,6 +109,9 @@ function scrapeMessages(){
     //get existing messages
     var newMessages = $(".message-line");
 
+    //create a new object for the current minute
+    var minuteData = emotesData[curMinute] = {};
+
     //count occurrences of emotes in each message
     for(var i = 0; i < newMessages.length; i++){
         var messagetext = $(newMessages[i]).children(".message")[0];
@@ -110,16 +119,24 @@ function scrapeMessages(){
         if(emotes.length > 0){
             //console.log(emotes);
             for(var j = 0; j < emotes.length; j++){
-                console.log(emotes[j].alt);
+                //console.log(emotes[j].alt);
+                var curEmote = emotes[j].alt; //get type of emote from the alt text of the image
 
-                //add to json
+                //add to minuteData (and emotesData)
+                if(minuteData.hasOwnProperty(curEmote)){
+                    //console.log("already has "+curEmote+" as property");
+                    minuteData[curEmote]++;
+                }
+                else{
+                    //console.log("adding new property "+curEmote+" to minuteData");
+                    minuteData[curEmote] = 1;
+                }
             }
-
         }
     }
 
-
-
     //clear messages from DOM
     newMessages.remove();
+
+    //emit event to any open graphs telling them to redraw
 }
