@@ -1,3 +1,21 @@
 .asdfasdfasdfasdf{
   color:red;
 }
+
+.button-text{
+  text-transform:uppercase;
+  font-size:9px;
+}
+.button-img{
+  height:30px;
+  margin-top:9px;
+}
+.button-container{
+  display:inline-block;
+  text-align:center;
+  width:50px;
+  margin-left:15px;
+  vertical-align:top;
+  opacity:0;
+  transition:.5s;
+}
