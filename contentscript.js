@@ -168,11 +168,23 @@ function redrawIcon(){
         }
     }
 
-    var imgURL = emotesSources[mostEmotes];
+    //drop the existing emote off the bottom
     var emoteButton = document.getElementById("emoteButton");
-    emoteButton.src = imgURL;
+    $(emoteButton).css({"top":"100px"});
 
-    //should rescale to be centered
-    $(emoteButton).css({"right":30-emoteButton.width/2+"px"});
-    $(emoteButton).css({"top":30-emoteButton.height/2+"px"});
+    setTimeout(function(){
+        //move image to the right side
+        var imgURL = emotesSources[mostEmotes];
+        emoteButton.src = imgURL;
+        $(emoteButton).css({"top":30-emoteButton.height/2+"px"});
+        $(emoteButton).css({"right":"-100px"});
+        setTimeout(function(){
+            //move image to the center
+            $(emoteButton).css({"right":30-emoteButton.width/2+"px"});
+        },300);
+    },300);
+
+
+
+
 }

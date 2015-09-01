@@ -18,4 +18,8 @@
   opacity: 0;
   transition: .5s; }
 
+#emoteButton {
+  transition: all .2s;
+  overflow: hidden; }
+
 /*# sourceMappingURL=style.css.map */
