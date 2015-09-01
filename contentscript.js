@@ -11,7 +11,7 @@ var emotesData;         //array of the emotes
 var emotesSources = {}; //object with links to the image source
 
 $(document).ready(function () {
-    console.log("CONTENT SCRIPT LOADED");
+    //console.log("CONTENT SCRIPT LOADED");
 
     //create the initial panel / ui
     //BabyRage ?
@@ -40,7 +40,6 @@ $(document).ready(function () {
         //visualize();
         event.stopPropagation();
     })
-
 });
 
 function toggleUI(){
@@ -148,4 +147,32 @@ function scrapeMessages(){
     newMessages.remove();
 
     //emit event to any open graphs telling them to redraw
+    redrawGraphs();
+}
+
+function redrawGraphs(){
+    redrawIcon();
+
+
+}
+
+function redrawIcon(){
+    var minuteEmotes = emotesData[emotesData.length-1];
+    var emoteKeys = Object.keys(minuteEmotes);
+    var mostNumberEmotes = 0;
+    var mostEmotes;
+    for(var i = 0; i < emoteKeys.length; i++){
+        if(minuteEmotes[emoteKeys[i]] > mostNumberEmotes){
+            mostNumberEmotes = minuteEmotes[emoteKeys[i]];
+            mostEmotes = emoteKeys[i];
+        }
+    }
+
+    var imgURL = emotesSources[mostEmotes];
+    var emoteButton = document.getElementById("emoteButton");
+    emoteButton.src = imgURL;
+
+    //should rescale to be centered
+    $(emoteButton).css({"right":30-emoteButton.width/2+"px"});
+    $(emoteButton).css({"top":30-emoteButton.height/2+"px"});
 }
