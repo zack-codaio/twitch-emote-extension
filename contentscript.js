@@ -22,7 +22,7 @@ $(document).ready(function () {
     document.getElementById("emoteButton").src = imgURL;
 
     emotePanel = $("#emotePanel");
-    emotePanel.click(function(){
+    emotePanel.click(function () {
         toggleUI();
     });
 
@@ -35,12 +35,12 @@ $(document).ready(function () {
     //create visualize panel
     $('body').append('<div id="visualizePanel"></div>');
 
-    $("#recordButton").click(function(event){
-       toggleRecord();
+    $("#recordButton").click(function (event) {
+        toggleRecord();
         event.stopPropagation();
 
     });
-    $("#visualizeButton").click(function(event){
+    $("#visualizeButton").click(function (event) {
         toggleVisualize();
         event.stopPropagation();
     })
@@ -48,31 +48,30 @@ $(document).ready(function () {
     init_graph();
 });
 
-function toggleUI(){
+function toggleUI() {
     console.log("toggling UI");
 
 
-    if(ui_open){
+    if (ui_open) {
 
-        $(".button-container").css({"opacity":0});
+        $(".button-container").css({"opacity": 0});
         //$(".button-container").hide(500);
 
-        setTimeout(function(){
-            $(".button-container").css({"display":"none"});
-            $("#emotePanel").css({"width":"60px"});
-        },500);
-
+        setTimeout(function () {
+            $(".button-container").css({"display": "none"});
+            $("#emotePanel").css({"width": "60px"});
+        }, 500);
 
 
         ui_open = false;
 
     }
-    else{
-        $("#emotePanel").css({"width":"200px"});
-        $(".button-container").css({"display":"inline-block"});
-        setTimeout(function(){
-            $(".button-container").css({"opacity":1});
-        },500);
+    else {
+        $("#emotePanel").css({"width": "200px"});
+        $(".button-container").css({"display": "inline-block"});
+        setTimeout(function () {
+            $(".button-container").css({"opacity": 1});
+        }, 500);
 
         //$(".button-container").show();
 
@@ -82,17 +81,16 @@ function toggleUI(){
 }
 
 
+function toggleRecord() {
 
-function toggleRecord(){
-
-    if(recording){
+    if (recording) {
         console.log("Stopping recording");
         $("#recordImg").attr("src", chrome.extension.getURL("img/record.svg"));
         $("#record-text").html("Record");
         clearInterval(intervalID);
         recording = false;
     }
-    else{
+    else {
         console.log("Starting recording");
         $("#recordImg").attr("src", chrome.extension.getURL("img/pause.svg"));
         $("#record-text").html("Pause");
@@ -101,17 +99,17 @@ function toggleRecord(){
         $(".message-line").remove(); //clear out existing messages
         emotesData = [];
         curMinute = 0;
-        intervalID = setInterval(function(){
+        intervalID = setInterval(function () {
             scrapeMessages();
             curMinute++;
             console.log(emotesData);
-        },20000); //currently, 10 seconds
+        }, 20000); //currently, 10 seconds
 
         recording = true;
     }
 }
 
-function scrapeMessages(){
+function scrapeMessages() {
     //get existing messages
     var newMessages = $(".message-line");
 
@@ -119,29 +117,29 @@ function scrapeMessages(){
     var minuteData = emotesData[curMinute] = {};
 
     //count occurrences of emotes in each message
-    for(var i = 0; i < newMessages.length; i++){
+    for (var i = 0; i < newMessages.length; i++) {
         var messagetext = $(newMessages[i]).children(".message")[0];
         var emotes = $(messagetext).children("img");
-        if(emotes.length > 0){
+        if (emotes.length > 0) {
             //console.log(emotes);
-            for(var j = 0; j < emotes.length; j++){
+            for (var j = 0; j < emotes.length; j++) {
                 //console.log(emotes[j].alt);
                 var curEmote = emotes[j].alt; //get type of emote from the alt text of the image
                 var emoteSource = emotes[j].src;
 
                 //add to minuteData (and emotesData)
-                if(minuteData.hasOwnProperty(curEmote)){
+                if (minuteData.hasOwnProperty(curEmote)) {
                     //console.log("already has "+curEmote+" as property");
                     minuteData[curEmote]++;
                 }
-                else{
+                else {
                     //console.log("adding new property "+curEmote+" to minuteData");
                     minuteData[curEmote] = 1;
                 }
 
 
                 //add img source to emotesSources
-                if(!emotesSources.hasOwnProperty(curEmote)){
+                if (!emotesSources.hasOwnProperty(curEmote)) {
                     emotesSources[curEmote] = emoteSource;
                     //console.log(emotesSources);
                 }
@@ -156,17 +154,18 @@ function scrapeMessages(){
     redrawGraphs();
 }
 
-function redrawGraphs(){
+function redrawGraphs() {
     redrawIcon();
+    init_graph();
 }
 
-function redrawIcon(){
-    var minuteEmotes = emotesData[emotesData.length-1];
+function redrawIcon() {
+    var minuteEmotes = emotesData[emotesData.length - 1];
     var emoteKeys = Object.keys(minuteEmotes);
     var mostNumberEmotes = 0;
     var mostEmotes;
-    for(var i = 0; i < emoteKeys.length; i++){
-        if(minuteEmotes[emoteKeys[i]] > mostNumberEmotes){
+    for (var i = 0; i < emoteKeys.length; i++) {
+        if (minuteEmotes[emoteKeys[i]] > mostNumberEmotes) {
             mostNumberEmotes = minuteEmotes[emoteKeys[i]];
             mostEmotes = emoteKeys[i];
         }
@@ -175,35 +174,40 @@ function redrawIcon(){
     //drop the existing emote off the bottom
     var emoteButton = document.getElementById("emoteButton");
     //$(emoteButton).css({"top":"100px"});
-    $(emoteButton).css({"opacity":"0"});
+    $(emoteButton).css({"opacity": "0"});
 
-    setTimeout(function(){
+    setTimeout(function () {
         //move image to the right side
         var imgURL = emotesSources[mostEmotes];
         emoteButton.src = imgURL;
-        $(emoteButton).css({"top":30-emoteButton.height/2+"px"});
-        $(emoteButton).css({"right":"-100px"});
-        $(emoteButton).css({"opacity":"1"});
-        setTimeout(function(){
+        $(emoteButton).css({"top": 30 - emoteButton.height / 2 + "px"});
+        $(emoteButton).css({"right": "-100px"});
+        $(emoteButton).css({"opacity": "1"});
+        setTimeout(function () {
             //move image to the center
-            $(emoteButton).css({"right":30-emoteButton.width/2+"px"});
-        },300);
-    },300);
+            $(emoteButton).css({"right": 30 - emoteButton.width / 2 + "px"});
+        }, 300);
+    }, 300);
 }
 
-function toggleVisualize(){
-    if(visualizing == true){
-        $("#visualizeImg").css({"-webkit-filter":"grayscale(100%)"});
-        $("#visualizePanel").css({"left":"100%"});
+function toggleVisualize() {
+    if (visualizing == true) {
+        $("#visualizeImg").css({"-webkit-filter": "grayscale(100%)"});
+        $("#visualizePanel > svg").css({"opacity": "0"});
+        setTimeout(function () {
+            $("#visualizePanel").css({"left": "100%"});
+        }, 500);
         visualizing = false;
     }
-    else{
-     $("#visualizeImg").css({"-webkit-filter":"grayscale(0%)"});
-        $("#visualizePanel").css({"left":"0"});
+    else {
+        $("#visualizeImg").css({"-webkit-filter": "grayscale(0%)"});
+        $("#visualizePanel").css({"left": "0"});
+        setTimeout(function () {
+            $("#visualizePanel > svg").css({"opacity": "1"});
+        }, 500);
         visualizing = true;
     }
 }
-
 
 //from d3 stacked area chart example
 function init_graph() {
@@ -220,6 +224,7 @@ function init_graph() {
     var y = d3.scale.linear()
         .range([height, 0]);
 
+    //may need more than 20 colors
     var color = d3.scale.category20();
 
     var xAxis = d3.svg.axis()
@@ -233,7 +238,7 @@ function init_graph() {
 
     var area = d3.svg.area()
         .x(function (d) {
-            return x(d.date);
+            return x(d.xpos);
         })
         .y0(function (d) {
             return y(d.y0);
@@ -253,65 +258,78 @@ function init_graph() {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.tsv(chrome.extension.getURL("data.tsv"), function (error, data) {
-        if (error) throw error;
 
-        color.domain(d3.keys(data[0]).filter(function (key) {
-            return key !== "date";
-        }));
+    //replace with emotesData
+    data = emotesData;
 
-        data.forEach(function (d) {
-            d.date = parseDate(d.date);
+    console.log("TSV DATA");
+    console.log(data);
+    //tsv comes out as an array of columns with % for each browser - not too different from how I'm storing emotes
+    //should just need to adjust scale, and maybe there will be issues based on some emotes not being present for all columns
+
+    //instead of data[0], could use the keys of emotesSources
+    color.domain(d3.keys(emotesSources).filter(function (key) {
+        return key !== "date";
+    }));
+
+    console.log(color.domain());
+
+    var xpos = 0;
+    data.forEach(function (d) {
+        //this could just be 0,1,2,3,... etc
+        console.log(d);
+        d.xpos = xpos;
+        xpos++;
+    });
+
+    var browsers = stack(color.domain().map(function (name) {
+        return {
+            name: name,
+            values: data.map(function (d) {
+                return {date: d.xpos, y: d[name] / 100};
+            })
+        };
+    }));
+
+    x.domain(d3.extent(data, function (d) {
+        return d.xpos;
+    }));
+
+    var browser = svg.selectAll(".browser")
+        .data(browsers)
+        .enter().append("g")
+        .attr("class", "browser");
+
+    browser.append("path")
+        .attr("class", "area")
+        .attr("d", function (d) {
+            return area(d.values);
+        })
+        .style("fill", function (d) {
+            return color(d.name);
         });
 
-        var browsers = stack(color.domain().map(function (name) {
-            return {
-                name: name,
-                values: data.map(function (d) {
-                    return {date: d.date, y: d[name] / 100};
-                })
-            };
-        }));
+    browser.append("text")
+        .datum(function (d) {
+            return {name: d.name, value: d.values[d.values.length - 1]};
+        })
+        .attr("transform", function (d) {
+            return "translate(" + x(d.value.xpos) + "," + y(d.value.y0 + d.value.y / 2) + ")";
+        })
+        .attr("x", -6)
+        .attr("dy", ".35em")
+        .text(function (d) {
+            return d.name;
+        });
 
-        x.domain(d3.extent(data, function (d) {
-            return d.date;
-        }));
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
 
-        var browser = svg.selectAll(".browser")
-            .data(browsers)
-            .enter().append("g")
-            .attr("class", "browser");
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
 
-        browser.append("path")
-            .attr("class", "area")
-            .attr("d", function (d) {
-                return area(d.values);
-            })
-            .style("fill", function (d) {
-                return color(d.name);
-            });
-
-        browser.append("text")
-            .datum(function (d) {
-                return {name: d.name, value: d.values[d.values.length - 1]};
-            })
-            .attr("transform", function (d) {
-                return "translate(" + x(d.value.date) + "," + y(d.value.y0 + d.value.y / 2) + ")";
-            })
-            .attr("x", -6)
-            .attr("dy", ".35em")
-            .text(function (d) {
-                return d.name;
-            });
-
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-    });
 //end d3 stacked area chart example
 }

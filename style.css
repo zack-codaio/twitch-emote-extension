@@ -58,6 +58,9 @@
   left: 100%;
   z-index: 9900;
   transition: .5s ease; }
+  #visualizePanel svg {
+    opacity: 0;
+    transition: all .5s ease; }
 
 .browser text {
   text-anchor: end; }
