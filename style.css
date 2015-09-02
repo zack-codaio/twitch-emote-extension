@@ -59,4 +59,13 @@
   z-index: 9900;
   transition: .5s ease; }
 
+.browser text {
+  text-anchor: end; }
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges; }
+
 /*# sourceMappingURL=style.css.map */

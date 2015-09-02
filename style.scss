@@ -67,3 +67,20 @@
   z-index:9900;
   transition:.5s ease;
 }
+
+//from d3 stacked area chart example
+//body {
+//  font: 10px sans-serif;
+//}
+
+.browser text {
+  text-anchor: end;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
