@@ -18,11 +18,32 @@
   opacity: 0;
   transition: .5s; }
 
-#emoteButton {
-  transition: all .2s; }
-
 #emotePanel {
-  overflow: hidden; }
+  overflow: hidden;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: white;
+  z-index: 9999;
+  border: 1px solid #aaa;
+  border-radius: 60px;
+  transition: 0.5s ease; }
+  #emotePanel #emoteCircle {
+    top: -1px;
+    right: -1px;
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 60px;
+    border: 1px solid #888; }
+  #emotePanel #emoteButton {
+    line-height: 60px;
+    position: absolute;
+    right: 12.5px;
+    top: 14px;
+    transition: all .2s; }
 
 #visualizeImg {
   -webkit-filter: grayscale(100%);

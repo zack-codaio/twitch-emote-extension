@@ -16,7 +16,7 @@ $(document).ready(function () {
 
     //create the initial panel / ui
     //BabyRage ?
-    $('body').append('<div id="emotePanel" style="position:fixed;top:20px;right:20px;width:60px;height:60px;background:white;z-index:9999;border: 1px solid #aaa;border-radius:60px;transition: 0.5s ease;"><div style="top: -1px;right: -1px;position:absolute;width:60px;height:60px;border-radius:60px;border: 1px solid #888;"></div><img id="emoteButton" src="img/BibleThump.png" style="line-height:60px;position:absolute;right:12.5px;top:14px;"></div>');
+    $('body').append('<div id="emotePanel"><div id="emoteCircle"></div><img id="emoteButton" src="img/BibleThump.png"></div>');
 
     var imgURL = chrome.extension.getURL("img/BibleThump.png");
     document.getElementById("emoteButton").src = imgURL;
