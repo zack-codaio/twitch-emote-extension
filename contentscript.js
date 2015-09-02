@@ -9,13 +9,14 @@ var intervalID;         //the timer interval that controls when scraping is done
 var curMinute;          //track the current minute / interval
 var emotesData;         //array of the emotes
 var emotesSources = {}; //object with links to the image source
+var visualizing = false;
 
 $(document).ready(function () {
     //console.log("CONTENT SCRIPT LOADED");
 
     //create the initial panel / ui
     //BabyRage ?
-    $('body').append('<div id="emotePanel" style="position:fixed;top:20px;right:20px;width:60px;height:60px;background:white;z-index:9999;border: 1px solid #aaa;border-radius:60px;transition: 0.5s ease;"><img id="emoteButton" src="img/BibleThump.png" style="line-height:60px;position:absolute;right:12.5px;top:14px;"></div>');
+    $('body').append('<div id="emotePanel" style="position:fixed;top:20px;right:20px;width:60px;height:60px;background:white;z-index:9999;border: 1px solid #aaa;border-radius:60px;transition: 0.5s ease;"><div style="top: -1px;right: -1px;position:absolute;width:60px;height:60px;border-radius:60px;border: 1px solid #888;"></div><img id="emoteButton" src="img/BibleThump.png" style="line-height:60px;position:absolute;right:12.5px;top:14px;"></div>');
 
     var imgURL = chrome.extension.getURL("img/BibleThump.png");
     document.getElementById("emoteButton").src = imgURL;
@@ -31,15 +32,19 @@ $(document).ready(function () {
     emotePanel.append('<div id="visualizeButton" class="button-container"><img id="visualizeImg" class="button-img"><div class="button-text">Visualize</div></div>');
     document.getElementById("visualizeImg").src = chrome.extension.getURL("img/graph.svg");
 
+    //create visualize panel
+    $('body').append('<div id="visualizePanel"></div>');
+
     $("#recordButton").click(function(event){
        toggleRecord();
         event.stopPropagation();
 
     });
     $("#visualizeButton").click(function(event){
-        //visualize();
+        toggleVisualize();
         event.stopPropagation();
     })
+
 });
 
 function toggleUI(){
@@ -170,7 +175,8 @@ function redrawIcon(){
 
     //drop the existing emote off the bottom
     var emoteButton = document.getElementById("emoteButton");
-    $(emoteButton).css({"top":"100px"});
+    //$(emoteButton).css({"top":"100px"});
+    $(emoteButton).css({"opacity":"0"});
 
     setTimeout(function(){
         //move image to the right side
@@ -178,13 +184,23 @@ function redrawIcon(){
         emoteButton.src = imgURL;
         $(emoteButton).css({"top":30-emoteButton.height/2+"px"});
         $(emoteButton).css({"right":"-100px"});
+        $(emoteButton).css({"opacity":"1"});
         setTimeout(function(){
             //move image to the center
             $(emoteButton).css({"right":30-emoteButton.width/2+"px"});
         },300);
     },300);
+}
 
-
-
-
+function toggleVisualize(){
+    if(visualizing == true){
+        $("#visualizeImg").css({"-webkit-filter":"grayscale(100%)"});
+        $("#visualizePanel").css({"left":"100%"});
+        visualizing = false;
+    }
+    else{
+     $("#visualizeImg").css({"-webkit-filter":"grayscale(0%)"});
+        $("#visualizePanel").css({"left":"0"});
+        visualizing = true;
+    }
 }

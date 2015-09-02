@@ -19,7 +19,23 @@
   transition: .5s; }
 
 #emoteButton {
-  transition: all .2s;
+  transition: all .2s; }
+
+#emotePanel {
   overflow: hidden; }
+
+#visualizeImg {
+  -webkit-filter: grayscale(100%);
+  transition: .3s; }
+
+#visualizePanel {
+  background: rgba(0, 0, 0, 0.9);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 100%;
+  z-index: 9900;
+  transition: .5s ease; }
 
 /*# sourceMappingURL=style.css.map */
