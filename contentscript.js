@@ -211,6 +211,7 @@ function toggleVisualize() {
 
 //from d3 stacked area chart example
 function init_graph() {
+    $("#visualizePanel").html("");
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
@@ -277,19 +278,24 @@ function init_graph() {
     var xpos = 0;
     data.forEach(function (d) {
         //this could just be 0,1,2,3,... etc
-        console.log(d);
-        d.xpos = xpos;
+        //console.log(d);
+        d.xpos = xpos; //think this may actually be causing issues? not sure
         xpos++;
     });
 
+    //this is where values are being assigned -- needs to be adapted
     var browsers = stack(color.domain().map(function (name) {
         return {
             name: name,
             values: data.map(function (d) {
-                return {date: d.xpos, y: d[name] / 100};
+                //return {date: d.xpos, y: d[name]/100};
+                return {date: d.xpos, y: ((typeof(d[name]) != "undefined") ? d[name] : 0)};
+                //should be scaled by the greatest total number of emotes in an interval
+                //looks like
             })
         };
     }));
+    console.log(browsers);
 
     x.domain(d3.extent(data, function (d) {
         return d.xpos;
@@ -314,7 +320,7 @@ function init_graph() {
             return {name: d.name, value: d.values[d.values.length - 1]};
         })
         .attr("transform", function (d) {
-            return "translate(" + x(d.value.xpos) + "," + y(d.value.y0 + d.value.y / 2) + ")";
+            return "translate(" + x(d.value.date) + "," + y(d.value.y0 + d.value.y / 2) + ")";
         })
         .attr("x", -6)
         .attr("dy", ".35em")
