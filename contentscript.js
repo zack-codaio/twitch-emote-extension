@@ -289,7 +289,7 @@ function init_graph() {
             name: name,
             values: data.map(function (d) {
                 //return {date: d.xpos, y: d[name]/100};
-                return {date: d.xpos, y: ((typeof(d[name]) != "undefined") ? d[name] : 0)};
+                return {date: d.xpos, y: ((typeof(d[name]) != "undefined") ? d[name] : 0), xpos: d.xpos};
                 //should be scaled by the greatest total number of emotes in an interval
                 //looks like
             })
