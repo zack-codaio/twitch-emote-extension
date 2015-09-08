@@ -276,11 +276,24 @@ function init_graph() {
     console.log(color.domain());
 
     var xpos = 0;
+    var largestSpike = 0;
     data.forEach(function (d) {
         //this could just be 0,1,2,3,... etc
-        //console.log(d);
         d.xpos = xpos; //think this may actually be causing issues? not sure
         xpos++;
+
+        var curSpike = 0;
+        var curKeys = Object.keys(d)
+        for(var i = 0; i < curKeys.length; i++){
+            if(curKeys[i] != "xpos"){
+                curSpike += d[curKeys[i]];
+            }
+        }
+        if(curSpike > largestSpike){
+            largestSpike = curSpike;
+            console.log("new largest spike = "+largestSpike)//this should happen when the new object for the interval is added, not here
+        }
+        console.log(d);
     });
 
     //this is where values are being assigned -- needs to be adapted
@@ -289,7 +302,7 @@ function init_graph() {
             name: name,
             values: data.map(function (d) {
                 //return {date: d.xpos, y: d[name]/100};
-                return {date: d.xpos, y: ((typeof(d[name]) != "undefined") ? d[name] : 0), xpos: d.xpos};
+                return {date: d.xpos, y: ((typeof(d[name]) != "undefined") ? d[name]/largestSpike : 0), xpos: d.xpos};
                 //should be scaled by the greatest total number of emotes in an interval
                 //looks like
             })
