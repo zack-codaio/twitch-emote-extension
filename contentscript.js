@@ -9,7 +9,7 @@ var intervalID;         //the timer interval that controls when scraping is done
 var curMinute;          //track the current minute / interval
 var emotesData;         //array of the emotes
 var emotesSources = {}; //object with links to the image source
-var visualizing = false;
+var visualizing = false;//boolean toggle for if the visualization panel is open or not
 
 $(document).ready(function () {
     //console.log("CONTENT SCRIPT LOADED");
@@ -211,144 +211,161 @@ function toggleVisualize() {
 
 //from d3 stacked area chart example
 function init_graph() {
-    $("#visualizePanel").html("");
-    var margin = {top: 20, right: 20, bottom: 30, left: 50},
-        width = 960 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
-
-    var parseDate = d3.time.format("%y-%b-%d").parse,
-        formatPercent = d3.format(".0%");
-
-    var x = d3.time.scale()
-        .range([0, width]);
-
-    var y = d3.scale.linear()
-        .range([height, 0]);
-
-    //may need more than 20 colors
-    var color = d3.scale.category20();
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .tickFormat(formatPercent);
-
-    var area = d3.svg.area()
-        .x(function (d) {
-            return x(d.xpos);
-        })
-        .y0(function (d) {
-            return y(d.y0);
-        })
-        .y1(function (d) {
-            return y(d.y0 + d.y);
-        });
-
-    var stack = d3.layout.stack()
-        .values(function (d) {
-            return d.values;
-        });
-
-    var svg = d3.select("#visualizePanel").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    $("#visualizePanel > svg").css({"opacity": "0"});
+    setTimeout(function () {
 
 
-    //replace with emotesData
-    data = emotesData;
+        $("#visualizePanel").html("");
+        //get screen width and height
+        var screenWidth = window.innerWidth;
+        var screenHeight = window.innerHeight;
 
-    console.log("TSV DATA");
-    console.log(data);
-    //tsv comes out as an array of columns with % for each browser - not too different from how I'm storing emotes
-    //should just need to adjust scale, and maybe there will be issues based on some emotes not being present for all columns
+        var margin = {top: 120, right: 50, bottom: 50, left: 50},
+            width = screenWidth - margin.left - margin.right,
+            height = screenHeight - margin.top - margin.bottom;
+        //console.debug(width +" "+height);
 
-    //instead of data[0], could use the keys of emotesSources
-    color.domain(d3.keys(emotesSources).filter(function (key) {
-        return key !== "date";
-    }));
+        var parseDate = d3.time.format("%y-%b-%d").parse,
+            formatPercent = d3.format(".0%");
 
-    console.log(color.domain());
+        var x = d3.time.scale()
+            .range([0, width]);
 
-    var xpos = 0;
-    var largestSpike = 0;
-    data.forEach(function (d) {
-        //this could just be 0,1,2,3,... etc
-        d.xpos = xpos; //think this may actually be causing issues? not sure
-        xpos++;
+        var y = d3.scale.linear()
+            .range([height, 0]);
 
-        var curSpike = 0;
-        var curKeys = Object.keys(d)
-        for(var i = 0; i < curKeys.length; i++){
-            if(curKeys[i] != "xpos"){
-                curSpike += d[curKeys[i]];
-            }
-        }
-        if(curSpike > largestSpike){
-            largestSpike = curSpike;
-            console.log("new largest spike = "+largestSpike)//this should happen when the new object for the interval is added, not here
-        }
-        console.log(d);
-    });
+        //may need more than 20 colors
+        var color = d3.scale.category20();
 
-    //this is where values are being assigned -- needs to be adapted
-    var browsers = stack(color.domain().map(function (name) {
-        return {
-            name: name,
-            values: data.map(function (d) {
-                //return {date: d.xpos, y: d[name]/100};
-                return {date: d.xpos, y: ((typeof(d[name]) != "undefined") ? d[name]/largestSpike : 0), xpos: d.xpos};
-                //should be scaled by the greatest total number of emotes in an interval
-                //looks like
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .tickFormat(formatPercent);
+
+        var area = d3.svg.area()
+            .x(function (d) {
+                return x(d.xpos);
             })
-        };
-    }));
-    console.log(browsers);
+            .y0(function (d) {
+                return y(d.y0);
+            })
+            .y1(function (d) {
+                return y(d.y0 + d.y);
+            });
 
-    x.domain(d3.extent(data, function (d) {
-        return d.xpos;
-    }));
+        var stack = d3.layout.stack()
+            .values(function (d) {
+                return d.values;
+            });
 
-    var browser = svg.selectAll(".browser")
-        .data(browsers)
-        .enter().append("g")
-        .attr("class", "browser");
+        var svg = d3.select("#visualizePanel").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    browser.append("path")
-        .attr("class", "area")
-        .attr("d", function (d) {
-            return area(d.values);
-        })
-        .style("fill", function (d) {
-            return color(d.name);
+
+        //replace with emotesData
+        data = emotesData;
+
+        console.log("TSV DATA");
+        console.log(data);
+        //tsv comes out as an array of columns with % for each browser - not too different from how I'm storing emotes
+        //should just need to adjust scale, and maybe there will be issues based on some emotes not being present for all columns
+
+        //instead of data[0], could use the keys of emotesSources
+        color.domain(d3.keys(emotesSources).filter(function (key) {
+            return key !== "date";
+        }));
+
+        console.log(color.domain());
+
+        var xpos = 0;
+        var largestSpike = 0;
+        data.forEach(function (d) {
+            //this could just be 0,1,2,3,... etc
+            d.xpos = xpos; //think this may actually be causing issues? not sure
+            xpos++;
+
+            var curSpike = 0;
+            var curKeys = Object.keys(d)
+            for (var i = 0; i < curKeys.length; i++) {
+                if (curKeys[i] != "xpos") {
+                    curSpike += d[curKeys[i]];
+                }
+            }
+            if (curSpike > largestSpike) {
+                largestSpike = curSpike;
+                console.log("new largest spike = " + largestSpike)//this should happen when the new object for the interval is added, not here
+            }
+            console.log(d);
         });
 
-    browser.append("text")
-        .datum(function (d) {
-            return {name: d.name, value: d.values[d.values.length - 1]};
-        })
-        .attr("transform", function (d) {
-            return "translate(" + x(d.value.date) + "," + y(d.value.y0 + d.value.y / 2) + ")";
-        })
-        .attr("x", -6)
-        .attr("dy", ".35em")
-        .text(function (d) {
-            return d.name;
-        });
+        //this is where values are being assigned -- needs to be adapted
+        var browsers = stack(color.domain().map(function (name) {
+            return {
+                name: name,
+                values: data.map(function (d) {
+                    //return {date: d.xpos, y: d[name]/100};
+                    return {
+                        date: d.xpos,
+                        y: ((typeof(d[name]) != "undefined") ? d[name] / largestSpike : 0),
+                        xpos: d.xpos
+                    };
+                    //should be scaled by the greatest total number of emotes in an interval
+                    //now scaled by largestSpike
+                })
+            };
+        }));
+        console.log(browsers);
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        x.domain(d3.extent(data, function (d) {
+            return d.xpos;
+        }));
 
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
+        var browser = svg.selectAll(".browser")
+            .data(browsers)
+            .enter().append("g")
+            .attr("class", "browser");
 
+        browser.append("path")
+            .attr("class", "area")
+            .attr("d", function (d) {
+                return area(d.values);
+            })
+            .style("fill", function (d) {
+                return color(d.name);
+            });
+
+        browser.append("text")
+            .datum(function (d) {
+                return {name: d.name, value: d.values[d.values.length - 1]};
+            })
+            .attr("transform", function (d) {
+                return "translate(" + x(d.value.date) + "," + y(d.value.y0 + d.value.y / 2) + ")";
+            })
+            .attr("x", -6)
+            .attr("dy", ".35em")
+            .text(function (d) {
+                return d.name;
+            });
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        if (visualizing) {
+            $("#visualizePanel > svg").css({"opacity": "1"});
+        }
+    }, 500);
 //end d3 stacked area chart example
 }
