@@ -71,4 +71,7 @@
   stroke: #000;
   shape-rendering: crispEdges; }
 
+.browser {
+  transition: opacity .2s; }
+
 /*# sourceMappingURL=style.css.map */

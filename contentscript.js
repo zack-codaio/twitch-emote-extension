@@ -363,6 +363,14 @@ function init_graph() {
             .attr("class", "y axis")
             .call(yAxis);
 
+        $(".browser").mouseenter(function(){
+           $(".browser").css({"opacity":".3"});
+            this.style.opacity = 1;
+        })
+            .mouseleave(function(){
+                $(".browser").css({"opacity":"1"});
+            });
+
         if (visualizing) {
             $("#visualizePanel > svg").css({"opacity": "1"});
         }
