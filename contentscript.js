@@ -11,9 +11,8 @@ var emotesData;         //array of the emotes
 var emotesSources = {}; //object with links to the image source
 var visualizing = false;//boolean toggle for if the visualization panel is open or not
 
+// Main - glue everything together
 $(document).ready(function () {
-    //console.log("CONTENT SCRIPT LOADED");
-
     //create the initial panel / ui
     //BabyRage ?
     $('body').append('<div id="emotePanel"><div id="emoteCircle"></div><img id="emoteButton" src="img/BibleThump.png"></div>');
@@ -44,16 +43,16 @@ $(document).ready(function () {
         toggleVisualize();
         event.stopPropagation();
     })
+    //end UI
 
+    // in init visualizer
     init_graph();
 });
 
+
+// UI controller
 function toggleUI() {
-    console.log("toggling UI");
-
-
     if (ui_open) {
-
         $(".button-container").css({"opacity": 0});
         //$(".button-container").hide(500);
 
@@ -77,10 +76,9 @@ function toggleUI() {
 
         ui_open = true;
     }
-
 }
 
-
+// UI controller ?
 function toggleRecord() {
 
     if (recording) {
@@ -109,6 +107,7 @@ function toggleRecord() {
     }
 }
 
+// Scraper
 function scrapeMessages() {
     //get existing messages
     var newMessages = $(".message-line");
@@ -154,11 +153,13 @@ function scrapeMessages() {
     redrawGraphs();
 }
 
+// Visualizer
 function redrawGraphs() {
     redrawIcon();
     init_graph();
 }
 
+// ui controller (interfaced with scraper)
 function redrawIcon() {
     var minuteEmotes = emotesData[emotesData.length - 1];
     var emoteKeys = Object.keys(minuteEmotes);
@@ -190,6 +191,7 @@ function redrawIcon() {
     }, 300);
 }
 
+// Ui controller
 function toggleVisualize() {
     if (visualizing == true) {
         $("#visualizeImg").css({"-webkit-filter": "grayscale(100%)"});
@@ -209,6 +211,7 @@ function toggleVisualize() {
     }
 }
 
+// visualizer - draws from scraper
 //from d3 stacked area chart example
 function init_graph() {
     $("#visualizePanel > svg").css({"opacity": "0"});
