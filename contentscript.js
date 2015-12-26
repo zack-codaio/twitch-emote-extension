@@ -8,6 +8,8 @@ $(document).ready(function () {
    console.log("Twitch Emote Extension inititialization.");
 });
 
+// interval should be pulled out as a const
+
 // handles user input, binds actions of other objects to UI state
    // FUNCTIONS:
    // toggleUI - expanded, ui_open
@@ -96,11 +98,15 @@ function uiCtlFactory () {
             // same for triggering scraping
             emotesData = [];
             curMinute = 0;
-            intervalID = setInterval(function () {
-               scrapeMessages();
-               curMinute++;
-               console.log(emotesData);
-            }, 20000); //currently, 10 seconds
+
+            // scraper should manage its own interval
+            // intervalID = setInterval(function () {
+            //    // scrapeMessages();
+            //    //scraper.startScraping();
+
+            //    curMinute++;
+            //    console.log(emotesData);
+            // }, 20000); //currently, 10 seconds
          } else {
             console.log("Stopping recording");
             $("#recordImg").attr("src", chrome.extension.getURL("img/record.svg"));
@@ -120,7 +126,7 @@ function uiCtlFactory () {
 
       // should maybe be in the visualizer?
       redrawIcon: function () {
-
+         // on receiving event of new data
       },
 
       // should this also have explicit functions?
@@ -148,12 +154,80 @@ function uiCtlFactory () {
 function scraperFactory () {
    var scraper;
 
-   var emotesData;         //array of the emotes
-   var emotesSources = {}; //object with links to the image source
-   var intervalID;         //the timer interval that controls when scraping is done
+   scraper.scrapeIndex = 0;
+   scraper.emotesData = [];         //array of the emotes
+   scraper.emotesSources = {}; //object with links to the image source
+   scraper.intervalID;         //the timer interval that controls when scraping is done
+   scraper.scraping = false;
+   scraper.msInterval = 20000; //20 seconds
+
+   scraper.toggleScraping = function () {
+      this.scraping = !this.scraping;
+      if (this.scraping) {
+         this.startScraping();
+      } else {
+         this.stopScraping();
+      }
+   };
+
+   scraper.startScraping = function () {
+      scraper.intervalID = setInterval(function () {
+         scraper.scrape();
+         scraper.scrapeIndex++;
+         console.log(emotesData);
+      }, scraper.msInterval);
+
+      console.log('Starting scraper');
+   };
+
+   scraper.stopScraping = function () {
+      // clear interval
+      clearInterval(scraper.msInterval);
+      console.log('Stopping scraper');
+   };
 
    scraper.scrape = function () {
+      //get existing messages
+      var newMessages = $(".message-line");
 
+      //create a new object for the current minute
+      var minuteData = emotesData[curMinute] = {};
+
+      //count occurrences of emotes in each message
+      for (var i = 0; i < newMessages.length; i++) {
+        var messagetext = $(newMessages[i]).children(".message")[0];
+        var emotes = $(messagetext).children("img");
+        if (emotes.length > 0) {
+            //console.log(emotes);
+            for (var j = 0; j < emotes.length; j++) {
+                //console.log(emotes[j].alt);
+                var curEmote = emotes[j].alt; //get type of emote from the alt text of the image
+                var emoteSource = emotes[j].src;
+
+                //add to minuteData (and emotesData)
+                if (minuteData.hasOwnProperty(curEmote)) {
+                    //console.log("already has "+curEmote+" as property");
+                    minuteData[curEmote]++;
+                }
+                else {
+                    //console.log("adding new property "+curEmote+" to minuteData");
+                    minuteData[curEmote] = 1;
+                }
+
+                //add img source to emotesSources
+                if (!emotesSources.hasOwnProperty(curEmote)) {
+                    emotesSources[curEmote] = emoteSource;
+                    //console.log(emotesSources);
+                }
+            }
+        }
+      }
+
+      // tag existing as viewed
+      // newMessages.remove();
+
+      //emit event to any open graphs telling them to redraw
+      // redrawGraphs();
    }
 
    scraper.allData = function () {
@@ -167,6 +241,8 @@ function scraperFactory () {
    scraper.currentEmote = function () {
 
    }
+
+   // broadcast new data
 
 
    return scraper;
